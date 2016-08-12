@@ -1,0 +1,2 @@
+# 忽略通过NPM安装的包
+node_modules

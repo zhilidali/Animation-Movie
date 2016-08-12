@@ -1,0 +1,14 @@
+{
+  "name": "CG",
+  "version": "0.0.0",
+  "description": "动画电影",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zhilidali",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "express3-handlebars": "^0.5.2"
+  }
+}
