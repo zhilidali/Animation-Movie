@@ -1,6 +1,7 @@
 //主程序入口文件
 var express = require('express');
 var mymodule = require('./lib/mymodule');
+var credentials = require('./lib/credentials.js');
 var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
 var app = express();
@@ -22,7 +23,18 @@ app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
 app.set('port', process.env.PORT || 3000);
 
 app.use(require('body-parser')());
+app.use(require('cookie-parser')(credentials.cookieSecret));
+app.use(require('express-session')());
 app.use(express.static(__dirname+'/public'));//static中间件,express.static指定静态文件目录
+app.use(function(req, res, next){//简单中间件例子
+	console.log('处理请求 "' + req.url + '"....');
+	next();
+});
+app.use(function(req, res, next){//如果有即显消息，把它传到上下文中，然后清除它
+	res.locals.flash = req.session.flash;
+	delete req.session.flash;
+	next();
+});
 app.use(function(req, res, next) {//页面测试中间件，检测查询字符串中的test=1
 	res.locals.showTests = app.get('env')!='production'&&req.query.test ==='1';
 	next();
