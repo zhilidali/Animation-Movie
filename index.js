@@ -2,6 +2,7 @@
 var express = require('express');
 var mymodule = require('./lib/mymodule');
 var credentials = require('./lib/credentials.js');
+var emailService = require('./lib/email.js')(credentials);
 var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
 var app = express();
