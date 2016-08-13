@@ -1,0 +1,15 @@
+{{#section 'head'}}
+	<meta name="robots" content="noindex">
+{{/section}}
+
+<h1>此页面用来测试段落section</h1>
+<p>我们测试引入jquery代码</p>
+<h2>好像没起作用</h2>
+
+{{#section 'jquery'}}
+	<script>
+		$(function() {
+			$('h2').html('jQuery代码成功')
+		})
+	</script>
+{{/section}}

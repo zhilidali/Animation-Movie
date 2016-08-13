@@ -15,6 +15,7 @@
 2.index.js 主程序文件
 3.views 视图文件夹
 	/layouts 放置布局/母版页的文件夹
+	/partials 局部文件
 4.public 放置静态资源
 	/img
 	/vendor 第三方库

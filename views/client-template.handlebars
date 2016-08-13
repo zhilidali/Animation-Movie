@@ -1,0 +1,37 @@
+{{!-- 此页面为客户端模板示例 --}}
+{{#section 'head'}}
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+	<script id="clientTemplate" type="text/x-handlebars-template">
+		Marry had a little <b>\{{animal}}</b>, its <b>\{{bodyPart}}</b>
+		was <b>\{{adjective}}</b> as <b>\{{noun}}</b>.
+	</script>
+{{/section}}
+<div id="client">请点击按钮....</div>
+<hr>
+<button id="btnClientTemplate">生成客户端模板</button>
+<button id="btnClientTemplateAjax">通过AJAX生成客户端模板</button>
+{{#section 'jquery'}}
+	<script>
+		$(function(){
+			var clientTemplate = Handlebars.compile($('#clientTemplate').html());
+			var $client = $('#client');
+			$('#btnClientTemplate').on('click', function(event){
+				event.preventDefault();
+				$client.html(clientTemplate({
+					animal: 'basilisk',
+					bodyPart: 'tail',
+					adjective: 'sharp',
+					noun: 'a needle'
+				}));
+			});
+			$('#btnClientTemplateAjax').on('click', function(event){
+				event.preventDefault();
+				$.ajax('/data/client-template', {
+					success: function(data){
+						$client.html(clientTemplate(data))
+					}
+				});
+			});
+		});
+	</script>
+{{/section}}
