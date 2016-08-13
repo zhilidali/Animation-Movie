@@ -1,0 +1,4 @@
+::ffff:127.0.0.1 - - [Sat, 13 Aug 2016 23:10:48 GMT] "GET /newsletter HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+::ffff:127.0.0.1 - - [Sat, 13 Aug 2016 23:10:49 GMT] "GET /vendor/bootstrap/css/bootstrap.min.css HTTP/1.1" 304 - "http://127.0.0.1:3000/newsletter" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+::ffff:127.0.0.1 - - [Sat, 13 Aug 2016 23:10:49 GMT] "GET /css/main.css HTTP/1.1" 304 - "http://127.0.0.1:3000/newsletter" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+::ffff:127.0.0.1 - - [Sat, 13 Aug 2016 23:10:49 GMT] "GET /img/QQ.png HTTP/1.1" 304 - "http://127.0.0.1:3000/newsletter" "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"

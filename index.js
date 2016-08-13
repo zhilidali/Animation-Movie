@@ -24,6 +24,46 @@ app.engine('handlebars', handlebars.engine);//设置模板引擎，处理指定�
 app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
 app.set('port', process.env.PORT || 3000);
 
+
+//使用域（更好的）错误处理
+app.use(function(req, res, next){
+    var domain = require('domain').create();// 为这个请求创建一个域
+    domain.on('error', function(err){// 为这个请求创建一个域
+        console.error('DOMAIN ERROR CAUGHT\n', err.stack);
+        try {
+            setTimeout(function(){// 在5 秒内进行故障保护关机
+                console.error('Failsafe shutdown.');
+                process.exit(1);
+            }, 5000);
+
+            // 从集群中断开
+            var worker = require('cluster').worker;
+            if(worker) worker.disconnect();
+
+            // 停止接收新请求
+            server.close();
+
+            try {
+                next(err);// 尝试使用Express 错误路由
+            } catch(error){
+                // 如果Express 错误路由失效，尝试返回普通文本响应
+                console.error('Express error mechanism failed.\n', error.stack);
+                res.statusCode = 500;
+                res.setHeader('content-type', 'text/plain');
+                res.end('Server error.');
+            }
+        } catch(error){
+            console.error('Unable to send 500 response.\n', error.stack);
+        }
+    });
+
+    // 向域中添加请求和响应对象
+    domain.add(req);
+    domain.add(res);
+
+    // 执行该域中剩余的请求链
+    domain.run(next);
+});
 //日志
 switch(app.get('env')){
     case 'development':// 紧凑的、彩色的开发日志
@@ -188,9 +228,8 @@ function startServer() {
 			'; Ctrl+C结束终端terminate');
 	});
 }
-if(require.main === module){//应用程序直接运行；启动应用程序服务器
+if(require.main === module){//直接运行；启动应用程序服务器
     startServer();
 } else {//作为一个模块通过“需要”输入的应用：导出函数来创建服务器
     module.exports = startServer;
 }
-
