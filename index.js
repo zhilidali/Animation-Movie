@@ -35,6 +35,13 @@ app.get('/about', function(req, res) {
 	});
 });
 
+app.get('/workroom/dreamworks', function(req, res) {
+	res.render('/workroom/dreamworks');
+});
+app.get('/workroom/dreamworks-rate', function(req, res) {
+	res.render('/workroom/dreamworks-rate');
+});
+
 //404页面
 app.use(function(err, req, res, next) {
 	console.error(err.stack);
