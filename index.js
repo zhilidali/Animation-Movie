@@ -16,13 +16,22 @@ app.set('port', process.env.PORT || 3000);
 //static 中间件,express.static指定静态文件的查找目录
 app.use(express.static(__dirname+'/public'));
 
+
+//页面测试中间件，检测查询字符串中的test=1
+app.use(function(req, res, next) {
+	res.locals.showTests = app.get('env')!='production'&&req.query.test ==='1';
+	next();
+});
+
+
 //路由
 app.get('/', function(req, res) {
 	res.render('home');
 });
 app.get('/about', function(req, res) {
 	res.render('about', {
-		MovieName: mymodule.getMovieName()
+		MovieName: mymodule.getMovieName(),
+		pageTestScript: '/qa/tests-about.js'
 	});
 });
 
