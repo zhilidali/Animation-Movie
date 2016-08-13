@@ -1,9 +1,9 @@
 //主程序入口文件
 var express = require('express');
 var mymodule = require('./lib/mymodule');
+var formidable = require('formidable');
+var jqupload = require('jquery-file-upload-middleware');
 var app = express();
-app.use(require('body-parser')());
-
 
 var handlebars = require('express3-handlebars')
 					.create({
@@ -19,19 +19,25 @@ var handlebars = require('express3-handlebars')
 					});
 app.engine('handlebars', handlebars.engine);//设置模板引擎，处理指定的后缀名文件
 app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
-
 app.set('port', process.env.PORT || 3000);
 
-//static 中间件,express.static指定静态文件的查找目录
-app.use(express.static(__dirname+'/public'));
-
-
-//页面测试中间件，检测查询字符串中的test=1
-app.use(function(req, res, next) {
+app.use(require('body-parser')());
+app.use(express.static(__dirname+'/public'));//static中间件,express.static指定静态文件目录
+app.use(function(req, res, next) {//页面测试中间件，检测查询字符串中的test=1
 	res.locals.showTests = app.get('env')!='production'&&req.query.test ==='1';
 	next();
 });
-
+app.use('/upload', function(req, res, next){
+	var now = Date.now();
+	jqupload.fileHandler({
+		uploadDir: function(){
+			return __dirname + '/public/uploads/' + now;
+		},
+		uploadUrl: function(){
+			return '/uploads/' + now;
+		},
+	})(req, res, next);
+});
 
 //路由
 app.get('/', function(req, res) {
@@ -78,6 +84,24 @@ app.get('/headers', function(req, res) {//示例：查看浏览器发送信息
 	var s = '';
 	for (var name in req.headers) s += name+":"+req.headers[name]+'\n';
 	res.send(s);
+});
+app.get('/upload-cover',function(req,res){//文件上传示例
+	var now = new Date();
+	res.render('upload-cover',{
+		year: now.getFullYear(),
+		month: now.getMonth()
+	});
+});
+app.post('/upload-cover/:year/:month', function(req, res){//文件上传示例
+	var form = new formidable.IncomingForm();
+	form.parse(req, function(err, fields, files){
+		if(err) return res.redirect(303, '/error');
+		console.log('收到的字段:');
+		console.log(fields);
+		console.log('收到的文件:');
+		console.log(files);
+		res.redirect(303, '/thank-you');
+	});
 });
 
 //404页面
