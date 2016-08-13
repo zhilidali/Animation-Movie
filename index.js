@@ -1,5 +1,6 @@
 //主程序入口文件
 var http = require('http');
+var fs = require('fs');
 var express = require('express');
 var mymodule = require('./lib/mymodule');
 var credentials = require('./lib/credentials.js');
@@ -197,14 +198,40 @@ app.get('/upload-cover',function(req,res){//文件上传示例
 		month: now.getMonth()
 	});
 });
+
+// 确保存在目录data
+var dataDir = __dirname + '/data';
+var vacationPhotoDir = dataDir + '/vacation-photo';
+if(!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+if(!fs.existsSync(vacationPhotoDir)) fs.mkdirSync(vacationPhotoDir);
+function saveContestEntry(contestName, email, year, month, photoPath){
+    // TODO...这个稍后再做
+}
 app.post('/upload-cover/:year/:month', function(req, res){//文件上传示例
 	var form = new formidable.IncomingForm();
 	form.parse(req, function(err, fields, files){
 		if(err) return res.redirect(303, '/error');
-		console.log('收到的字段:');
-		console.log(fields);
-		console.log('收到的文件:');
-		console.log(files);
+		if(err) {
+			res.session.flash = {
+				type: 'danger',
+				intro: 'Oops!',
+				message: '你的提交有一个错误处理。' +
+				'请重试.',
+			};
+			return res.redirect(303, '/upload-cover');
+		}
+		var photo = files.photo;
+		var dir = vacationPhotoDir + '/' + Date.now();
+		var path = dir + '/' + photo.name;
+		fs.mkdirSync(dir);
+		fs.renameSync(photo.path, dir + '/' + photo.name);
+		saveContestEntry('upload-cover', fields.email,
+			req.params.year, req.params.month, path);
+		req.session.flash = {
+			type: 'success',
+			intro: 'Good luck!',
+			message: '你已经参加了比赛。',
+		};
 		res.redirect(303, '/thank-you');
 	});
 });
