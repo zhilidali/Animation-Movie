@@ -1,4 +1,5 @@
 //主程序入口文件
+var http = require('http');
 var express = require('express');
 var mymodule = require('./lib/mymodule');
 var credentials = require('./lib/credentials.js');
@@ -23,6 +24,15 @@ app.engine('handlebars', handlebars.engine);//设置模板引擎，处理指定�
 app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
 app.set('port', process.env.PORT || 3000);
 
+//日志
+switch(app.get('env')){
+    case 'development':// 紧凑的、彩色的开发日志
+    	app.use(require('morgan')('dev'));
+        break;
+    case 'production':// 模块'express-logger' 支持按日志循环
+        app.use(require('express-logger')({ path: __dirname + '/log/requests.log'}));
+        break;
+}
 app.use(require('body-parser')());
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')());
@@ -79,6 +89,48 @@ app.get('/data/client-template', function(req, res) {//客户端模板
 app.get('/newsletter', function(req, res) {//表单处理
 	res.render('newsletter', {csrf: "CSRF token goes here"});
 });
+/*
+function NewsletterSignup(){
+}
+NewsletterSignup.prototype.save = function(cb){
+	cb();
+};
+var VALID_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+app.post('/newsletter', function(req, res){
+	var name = req.body.name || '', email = req.body.email || '';
+	// input validation
+	if(!email.match(VALID_EMAIL_REGEX)) {
+		if(req.xhr) return res.json({ error: 'Invalid name email address.' });
+		req.session.flash = {
+			type: 'danger',
+			intro: 'Validation error!',
+			message: 'The email address you entered was  not valid.',
+		};
+		return res.redirect(303, '/newsletter/archive');
+	}
+	new NewsletterSignup({ name: name, email: email }).save(function(err){
+		if(err) {
+			if(req.xhr) return res.json({ error: 'Database error.' });
+			req.session.flash = {
+				type: 'danger',
+				intro: 'Database error!',
+				message: 'There was a database error; please try again later.',
+			};
+			return res.redirect(303, '/newsletter/archive');
+		}
+		if(req.xhr) return res.json({ success: true });
+		req.session.flash = {
+			type: 'success',
+			intro: 'Thank you!',
+			message: 'You have now been signed up for the newsletter.',
+		};
+		return res.redirect(303, '/newsletter/archive');
+	});
+});
+app.get('/newsletter/archive', function(req, res){
+	res.render('newsletter/archive');
+});
+*/
 app.post('/process', function(req, res) {//表单处理
 	if (req.xhr || req.accepts('json, html')==='json') {
 		res.send({success: true});
@@ -128,6 +180,17 @@ app.use(function(err, req, res, next) {
 	res.status(500).render('500');
 });
 
-app.listen(app.get('port'), function() {
-	console.log('Start on http://localhost:'+app.get('port')+'; 摁Ctrl+C结束终端terminate');
-});
+var server;
+function startServer() {
+	server = http.createServer(app).listen(app.get('port'), function() {
+		console.log('Express started in ' + app.get('env') +
+			' Start on http://localhost:'+ app.get('port')+
+			'; Ctrl+C结束终端terminate');
+	});
+}
+if(require.main === module){//应用程序直接运行；启动应用程序服务器
+    startServer();
+} else {//作为一个模块通过“需要”输入的应用：导出函数来创建服务器
+    module.exports = startServer;
+}
+
