@@ -28,51 +28,51 @@ app.set('port', process.env.PORT || 3000);
 
 //使用域（更好的）错误处理
 app.use(function(req, res, next){
-    var domain = require('domain').create();// 为这个请求创建一个域
-    domain.on('error', function(err){// 为这个请求创建一个域
-        console.error('DOMAIN ERROR CAUGHT\n', err.stack);
-        try {
-            setTimeout(function(){// 在5 秒内进行故障保护关机
-                console.error('Failsafe shutdown.');
-                process.exit(1);
-            }, 5000);
+	var domain = require('domain').create();// 为这个请求创建一个域
+	domain.on('error', function(err){// 为这个请求创建一个域
+		console.error('DOMAIN ERROR CAUGHT\n', err.stack);
+		try {
+			setTimeout(function(){// 在5 秒内进行故障保护关机
+				console.error('Failsafe shutdown.');
+				process.exit(1);
+			}, 5000);
 
-            // 从集群中断开
-            var worker = require('cluster').worker;
-            if(worker) worker.disconnect();
+			// 从集群中断开
+			var worker = require('cluster').worker;
+			if(worker) worker.disconnect();
 
-            // 停止接收新请求
-            server.close();
+			// 停止接收新请求
+			server.close();
 
-            try {
-                next(err);// 尝试使用Express 错误路由
-            } catch(error){
-                // 如果Express 错误路由失效，尝试返回普通文本响应
-                console.error('Express error mechanism failed.\n', error.stack);
-                res.statusCode = 500;
-                res.setHeader('content-type', 'text/plain');
-                res.end('Server error.');
-            }
-        } catch(error){
-            console.error('Unable to send 500 response.\n', error.stack);
-        }
-    });
+			try {
+				next(err);// 尝试使用Express 错误路由
+			} catch(error){
+				// 如果Express 错误路由失效，尝试返回普通文本响应
+				console.error('Express error mechanism failed.\n', error.stack);
+				res.statusCode = 500;
+				res.setHeader('content-type', 'text/plain');
+				res.end('Server error.');
+			}
+		} catch(error){
+			console.error('Unable to send 500 response.\n', error.stack);
+		}
+	});
 
-    // 向域中添加请求和响应对象
-    domain.add(req);
-    domain.add(res);
+	// 向域中添加请求和响应对象
+	domain.add(req);
+	domain.add(res);
 
-    // 执行该域中剩余的请求链
-    domain.run(next);
+	// 执行该域中剩余的请求链
+	domain.run(next);
 });
 //日志
 switch(app.get('env')){
-    case 'development':// 紧凑的、彩色的开发日志
-    	app.use(require('morgan')('dev'));
-        break;
-    case 'production':// 模块'express-logger' 支持按日志循环
-        app.use(require('express-logger')({ path: __dirname + '/log/requests.log'}));
-        break;
+	case 'development':// 紧凑的、彩色的开发日志
+		app.use(require('morgan')('dev'));
+		break;
+	case 'production':// 模块'express-logger' 支持按日志循环
+		app.use(require('express-logger')({ path: __dirname + '/log/requests.log'}));
+		break;
 }
 app.use(require('body-parser')());
 app.use(require('cookie-parser')(credentials.cookieSecret));
@@ -179,12 +179,15 @@ app.post('/process', function(req, res) {//表单处理
 		res.redirect(303, '/thank-you');
 	}
 });
+
+//跨页测试
+app.get('/workroom', function(req, res) {
+	res.render('workroom/workroom');
+});
 app.get('/workroom/dreamworks', function(req, res) {
-	res.render('/workroom/dreamworks');
+	res.render('workroom/dreamworks');
 });
-app.get('/workroom/dreamworks-rate', function(req, res) {
-	res.render('/workroom/dreamworks-rate');
-});
+
 app.get('/headers', function(req, res) {//示例：查看浏览器发送信息
 	res.set('Content-Type', 'text/plain');
 	var s = '';
@@ -205,7 +208,7 @@ var vacationPhotoDir = dataDir + '/vacation-photo';
 if(!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 if(!fs.existsSync(vacationPhotoDir)) fs.mkdirSync(vacationPhotoDir);
 function saveContestEntry(contestName, email, year, month, photoPath){
-    // TODO...这个稍后再做
+	// TODO...这个稍后再做
 }
 app.post('/upload-cover/:year/:month', function(req, res){//文件上传示例
 	var form = new formidable.IncomingForm();
@@ -256,7 +259,7 @@ function startServer() {
 	});
 }
 if(require.main === module){//直接运行；启动应用程序服务器
-    startServer();
+	startServer();
 } else {//作为一个模块通过“需要”输入的应用：导出函数来创建服务器
-    module.exports = startServer;
+	module.exports = startServer;
 }

@@ -3,15 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<title>CG 影视动画基地</title>
-	<meta name="description" content="">
+	<meta name="description" content="老少皆宜动画电影的交流社区">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	{{{_sections.head}}}
 
+	{{!-- 跨页测试 --}}
 	{{#if showTests}}<link rel="stylesheet" href="/vendor/mocha.css">{{/if}}
 	<link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/main.css">
-
-
 </head>
 <body>
 	<header>
@@ -33,7 +32,7 @@
 	<script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
 	{{{_sections.jquery}}}
 
-	{{#if showTests}}
+	{{#if showTests}}{{!-- 跨页测试 --}}
 		<div id="mocha"></div>
 		<script src="/vendor/mocha.js"></script>
 		<script src="/vendor/chai.js"></script>

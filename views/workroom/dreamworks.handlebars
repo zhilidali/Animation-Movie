@@ -1,2 +1,24 @@
-<h1>梦工厂</h1>
-<a href="/workroom/dreamworks-rate">梦工厂家族</a>
+<h1>梦工厂动画工作室</h1>
+<form>
+	<input type="hidden" name="referrer">
+	<div>
+		<label>
+			名字：<input type="text" id="fieldName" name="name">
+		</label>
+	</div>
+	<div>
+		<label>
+			家族大小：<input type="text" name="groupSize">
+		</label>
+	</div>
+	<div>
+		<label>
+			邮箱：<input type="email" name="email">
+		</label>
+	</div>
+</form>
+<script>
+	window.addEventListener('onload', function() {
+		$('input[name="referrer"]').val(document.referrer);
+	});
+</script>
