@@ -102,6 +102,26 @@ app.use('/upload', function(req, res, next){
 		},
 	})(req, res, next);
 });
+//局部文件
+function getFancy (){
+	return {
+		movieList: [
+			{
+				name: "爱宠大机密",
+				workroom: "娱乐照明"
+			},
+			{
+				name: "疯狂动物成",
+				workroom: "迪士尼"
+			}
+		]
+	};
+}
+app.use(function(req, res, next){
+	if(!res.locals.partials) res.locals.partials = {};
+	res.locals.partials.fancy = getFancy();
+	next();
+});
 
 //路由
 app.get('/', function(req, res) {

@@ -29,79 +29,80 @@
 
 	+ ### 页面测试
 
-	    - 目标：
-	        * 访问`http://localhost:3000`加载首页
-	        * 访问`http://localhost:3000?test=1`加载包含测试的首页
-	    a. 测试模块
+		- 目标：
+			* 访问`http://localhost:3000`加载首页
+			* 访问`http://localhost:3000?test=1`加载包含测试的首页
 
-	        ```
-	            $ npm install --save--dev mocha;
-	            $ npm install --save-dev chai;
-	            $ cp node_modules/mocha/mocha.js public/vendor
-	            $ cp node_modules/mocha/mocha.css public/vendor
-	            $ cp node_modules/chai/chai.js public/vendor
-	        ```
+		a. 测试模块
 
-	    b. 中间件检测查询字符串`test=1`,在路由之前添加
+			```
+				$ npm install --save--dev mocha;
+				$ npm install --save-dev chai;
+				$ cp node_modules/mocha/mocha.js public/vendor
+				$ cp node_modules/mocha/mocha.css public/vendor
+				$ cp node_modules/chai/chai.js public/vendor
+			```
 
-	        ```
-	            app.use(function(req, res){
-	                res.locals.showTest = app.get('env') !== 'public' && req.query.test === '1';
-	            });
-	        ```
+		b. 中间件检测查询字符串`test=1`,在路由之前添加
 
-	    c. 有条件的引入测试,`views/layouts/main.handlebars`
+			```
+				app.use(function(req, res){
+					res.locals.showTest = app.get('env') !== 'public' && req.query.test === '1';
+				});
+			```
 
-	        <head>部分
+		c. 有条件的引入测试,`views/layouts/main.handlebars`
 
-	            ```
-	            {{!-- 跨页测试 --}}
-	                {{#if showTests}}
-	                    <link rel="stylesheet" href="/vendor/mocha.css">
-	                {{/if}}
-	            ```
+			<head>部分
 
-	        </body>之前
+				```
+				{{!-- 跨页测试 --}}
+					{{#if showTests}}
+						<link rel="stylesheet" href="/vendor/mocha.css">
+					{{/if}}
+				```
 
-	            ```
-	                {{#if showTests}}{{!-- 跨页测试 --}}
-	                <div id="mocha"></div>
-	                <script src="/vendor/mocha.js"></script>
-	                <script src="/vendor/chai.js"></script>
-	                <script>
-	                    mocha.ui('tdd');
-	                    var assert = chai.assert;
-	                </script>
-	                <script src="/qa/tests-global.js"></script>
-	                {{#if pageTestScript}}
-	                    <script src="{{pageTestScript}}"></script>
-	                {{/if}}
-	                <script>
-	                    mocha.run();
-	                </script>
-	            {{/if}}
-	            ```
+			</body>之前
 
-	    d. 全局测试`public/qa/tasts-global.js`
+				```
+					{{#if showTests}}{{!-- 跨页测试 --}}
+					<div id="mocha"></div>
+					<script src="/vendor/mocha.js"></script>
+					<script src="/vendor/chai.js"></script>
+					<script>
+						mocha.ui('tdd');
+						var assert = chai.assert;
+					</script>
+					<script src="/qa/tests-global.js"></script>
+					{{#if pageTestScript}}
+						<script src="{{pageTestScript}}"></script>
+					{{/if}}
+					<script>
+						mocha.run();
+					</script>
+				{{/if}}
+				```
 
-	        ```
-	            suite('全局页面测试', function(){
-	                test('页面有一个有效的标题', function(){
-	                    assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
-	                });
-	            });
-	        ```
+		d. 全局测试`public/qa/tasts-global.js`
 
-	        访问http://localhost:3000?test=1
-	    e.页面测试`public/qa/tests-about.js`;
+			```
+				suite('全局页面测试', function(){
+					test('页面有一个有效的标题', function(){
+						assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
+					});
+				});
+			```
 
-	        ```
-	        suite('全局页面测试', function(){
-	            test('页面有一个有效的标题', function(){
-	                assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
-	            });
-	        });
-	        ```
+			访问http://localhost:3000?test=1
+		e.页面测试`public/qa/tests-about.js`;
+
+			```
+			suite('全局页面测试', function(){
+				test('页面有一个有效的标题', function(){
+					assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
+				});
+			});
+			```
 
 	+ ### 跨页测试
 
@@ -128,12 +129,16 @@
 		* 测试[lib](lib/mymodule.js)
 		* 创建[qa/test-unit.js](qa/tests-unit.js)
 		* `$ mocha -u tdd -R spec qa/test-unit.js`
+
 	+ ### 去毛测试
 		* `$ npm install -g jshint;`
 		* `$ jshint index.js;`
 		* 将jshint集成到编辑器
-	+ ### 链接检查[LinkChecker](http://wummel.github.io/linkchecker/)
+
+	+ ### 链接检查
+		[LinkChecker](http://wummel.github.io/linkchecker/)
 		* `$ linkchecker http://localhost:3000;`
+
 	+ ### 用Grunt实现自动化
 		a. 安装Grunt命令行及Grunt本身
 			* `$ install -g grunt-cli;`
@@ -145,3 +150,52 @@
 		c. 目录下创建[Gruntfile.js](Gruntfile.js)
 
 		d. 确保服务器运行，`$ grunt;`
+
++ ## Handlebars 模板引擎
+
+	+ ### `layout`布局与视图
+
+		* 视图首先被渲染，之后是布局
+
+	+ ### `partial`局部文件
+
+		a. 创建局部文件[partial](views/particals/partical.handlebars)
+		b. 主程序文件中添加虚拟数据函数，并添加中间件
+
+			```javascript
+				function getFancy (){
+					return {
+						movieList: [
+							{
+								name: "爱宠大机密"
+								workroom: "娱乐照明"
+							},
+							{
+								name: "疯狂动物成"
+								workroom: "迪士尼"
+							}
+						]
+					};
+				}
+				app.use(function(req, res, next){
+					if(!res.locals.partials) res.locals.partials = {};
+					res.locals.partials.fancy = getFancy();
+					next();
+				});
+			```
+
+		c. `home.handlebars`中包含这个局部文件`{{> fancy}}`
+	
+	+ ### `section`段落
+
+		* 视图本身添加到布局的不同部分时
+		a. 实例化Handlebars对象时，添加一个叫做section的方法
+		b. 创建[jquerytest](views/jquerytest.handlebars)
+		c. 布局文件里，放置段落
+
+	+ ### 客户端Handlebars: 显示动态内容
+
+		a. 创建[client-template](views/client-template.handlebars)
+		b. 添加针对client-template页面的路由和AJAX调用的路由
+
+
