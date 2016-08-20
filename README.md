@@ -220,6 +220,7 @@
 					}
 				});
 			```
+
 	+ ### 文件上传
 
 		* 创建视图[upload-cover](views/upload-cover.handlebars),其中指定`entype="multipart/form-data`来启用文件上传
@@ -267,4 +268,53 @@
 			```
 		* 添加文件上传的视图[upload-cover](views/upload-cover.handlebars);
 
++ ## Cookie与会话
 
+	* 创建`lib/credentials.js`凭证化文件，并添加到git忽略中
+
+		```
+			module.exports = {
+				cookieSecret: '此处是你的cookie密钥'
+			};
+		```
+
+	*  安装引入中间件
+		`$ npm indatll ---save cookie-parser;`
+		`app.use(require('cookie-parser')(credentials.cookieSecret));`
+	* 在任何能访问到相应对象的地方 设置cookie或签名cookie
+		`res.cookie('monster', 'nom nom');`
+		`res.cookie('signed_monster', 'nom nom', {signed: true});`
+	* 获取客户端发来的cookie
+		`var monster = req.cookie.monster;`
+		`var signedmonster = req.signedCookie.signedmonster;`
+	* 删除cookie：`ers.clearCookie('monster');`
+	* 安装引入session
+		`$ npm install --save express-session;`
+		`app.use(require('express-session')());`
+	* 使用会话：都是在请求对象上操作
+		`req.session.userName = 'zhilidali';`设置
+		`var colorScheme = req.session.colorSchem || 'dark;`获取
+		`delete req.session.colorScheme;`
+	* 会话实现flash即显消息
+		* 布局中添加
+
+			```html
+				{{#if flash}}
+					<div class="alert alert-dismissible alert-{{flash.type}}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<strong>{{flash.intro}}</strong> {{{flash.message}}}
+					</div>
+				{{/if}}
+			```
+
+		* 路由之前添加
+
+			```javascripr
+				app.use(function(req, res, next){//如果有即显消息，把它传到上下文中，然后清除它
+					res.locals.flash = req.session.flash;
+					delete req.session.flash;
+					next();
+				});
+			```
+
++ ##
