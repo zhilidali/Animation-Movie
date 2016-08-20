@@ -148,7 +148,7 @@ app.get('/data/client-template', function(req, res) {//客户端模板
 	});
 });
 app.get('/newsletter', function(req, res) {//表单处理
-	res.render('newsletter', {csrf: "CSRF token goes here"});
+	res.render('newsletter', {csrf: "这里是CSRF令牌"});
 });
 /*
 function NewsletterSignup(){

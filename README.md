@@ -9,7 +9,7 @@
 		*assert函数: Chai断言库
 		*页面测试：Mocha
 		*跨页测试: Zombies.js
-	4.
+	4. ...
 
 + ## 目录
 	1. package.json 存放项目元数据描述项目和列出依赖项
@@ -160,6 +160,7 @@
 	+ ### `partial`局部文件
 
 		a. 创建局部文件[partial](views/particals/partical.handlebars)
+
 		b. 主程序文件中添加虚拟数据函数，并添加中间件
 
 			```javascript
@@ -185,7 +186,7 @@
 			```
 
 		c. `home.handlebars`中包含这个局部文件`{{> fancy}}`
-	
+
 	+ ### `section`段落
 
 		* 视图本身添加到布局的不同部分时
@@ -197,5 +198,73 @@
 
 		a. 创建[client-template](views/client-template.handlebars)
 		b. 添加针对client-template页面的路由和AJAX调用的路由
+
++ ## 表单处理
+
+	+ ### 处理AJAX表单
+
+		* POST需要引入中间件解析URL编码体
+			* `$ npm install --save body-parser;`
+			* 主文件引入`app.use(require('body-parser')());`
+		* 创建视图[newsletter](views/newsletter.handlebars),并添加路由
+
+			```javascript
+				app.get('/newsletter', function(req, res) {//表单处理
+					res.render('newsletter', {csrf: "这里是CSRF令牌"});
+				});
+				app.post('/process', function(req, res) {//表单处理
+					if (req.xhr || req.accepts('json, html')==='json') {
+						res.send({success: true});
+					} else {
+						res.redirect(303, '/thank-you');
+					}
+				});
+			```
+	+ ### 文件上传
+
+		* 创建视图[upload-cover](views/upload-cover.handlebars),其中指定`entype="multipart/form-data`来启用文件上传
+		* `$ npm install --save formidable;`，引入。并创建路由处理程序
+
+			```javascript
+				var formidable = require('formidable');
+
+				app.get('/upload-cover',function(req,res){
+					var now = new Date();
+					res.render('upload-cover',{
+						year: now.getFullYear(),
+						month: now.getMonth()
+					});
+				});
+				app.post('./upload-cover/:year/:month', function(req, res){
+					var form = new formidable.IncomingForm();
+					form.parse(req, function(err, fields, files){
+						if(err) return res.redirect(303, '/error');
+						console.log(fields)
+						console.log(files)
+						res.redirect(303, '/thank-you')
+					});
+				});
+			```
+
+	+ ### jQuery文件上传
+
+		* 安装ImageMagick：`$ npm intall --save jquery-file-up;oad-middleware;`
+		* 主程序文件添加
+			```
+				var jqupload = require('jquery-file-upload-middleware');
+
+				app.use('/upload', function(req, res, next){
+					var now = Date.now();
+					jqupload.fileHandler({
+						uploadDir: function(){
+							return __dirname + '/public/uploads/' + now;
+						},
+						uploadUrl: function(){
+							return '/uploads/' + now;
+						},
+					})(req, res, next);
+				});
+			```
+		* 添加文件上传的视图[upload-cover](views/upload-cover.handlebars);
 
 
