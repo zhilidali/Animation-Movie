@@ -130,6 +130,9 @@ app.use(function(req, res, next){
 
 
 //路由
+/*app.get('/fail', function(req, res) {
+	throw new Error('Node!');//未捕获异常
+});*/
 app.get('/', function(req, res) {
 	res.render('home');
 });
@@ -279,8 +282,8 @@ app.use(function(err, req, res, next) {
 var server;
 function startServer() {
 	server = http.createServer(app).listen(app.get('port'), function() {
-		console.log('Express started in ' + app.get('env') +
-			' Start on http://localhost:'+ app.get('port')+
+		console.log('Express的执行环境:' + app.get('env') +
+			' 服务运行在:http://localhost:'+ app.get('port')+
 			'; Ctrl+C结束终端terminate');
 	});
 }

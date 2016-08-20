@@ -338,4 +338,64 @@
 			},
 		```
 
++ ## 与生产相关的问题
+
+	+ ### 执行环境:
+		一种在`production`生产、`development`开发、测试模式中运行应用程序的方法
+
+		* 用环境变量NODE_ENV执行执行环境更好
+			`$ export NODE_ENV=production`
+			`$ NODE)ENV=prodection node index`
+
+	+ ### 环境配置
+
+		* 开发环境：输入便于查看的彩色文本`$ npm install --save morgan;`
+		* 生产环境：日志循环`$ npm install --save express-logger;`
+
+		```javascript
+			switch(app.get('env')){
+				case 'development':// 紧凑的、彩色的开发日志
+					app.use(require('morgan')('dev'));
+					break;
+				case 'production':// 模块'express-logger' 支持按日志循环
+					app.use(require('express-logger')({ path: __dirname + '/log/requests.log'}));
+					break;
+			}
+		```
+
+	+ ### 扩展：向上扩展、向外扩展
+
+		- ##### 应用集群扩展：可为系统上每个CPU内核创建一个独立的服务器
+
+			a. 对主程序作调整
+
+				```javascript
+					var server;
+					function startServer() {
+						server = http.createServer(app).listen(app.get('port'), function() {
+							console.log('Express的执行环境:' + app.get('env') +
+								' 服务运行在:http://localhost:'+ app.get('port')+
+								'; Ctrl+C结束终端terminate');
+						});
+					}
+					if(require.main === module){
+						startServer();//直接运行；启动应用程序服务器
+					} else {
+						module.exports = startServer;//作为一个模块通过“需要”输入的应用：导出函数来创建服务器
+					}
+				```
+
+			b. 创建[index_cluster.js](index_cluster.js)
+
+		- ##### 处理未捕获异常
+
+		- ##### 多台服务器扩展
+
+	+ ### 网站监控
+
+	+ ### 压力测试
+
+		* `$ npm install --save loadtest;`
+		* [tests-stress.js](qa/tests-stress.js)
+
 + ##
