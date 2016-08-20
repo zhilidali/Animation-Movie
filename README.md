@@ -317,4 +317,12 @@
 				});
 			```
 
++ ## 中间件： 封装在程序中处理HTTP请求的功能(函数)
+
+	* [cartValidation](lib/cartValidation.js)
+	* `var cartValidation = require('./lib/cartValidation.js');`
+	*
+		`app.use(cartValidation.checkWaivers);`
+		`app.use(cartValidation.checkGuestCounts);`
+
 + ##

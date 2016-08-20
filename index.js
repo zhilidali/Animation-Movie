@@ -4,9 +4,11 @@ var fs = require('fs');
 var express = require('express');
 var mymodule = require('./lib/mymodule');
 var credentials = require('./lib/credentials.js');
+var cartValidation = require('./lib/cartValidation.js');
 var emailService = require('./lib/email.js')(credentials);
 var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
+
 var app = express();
 
 var handlebars = require('express3-handlebars')
@@ -26,6 +28,7 @@ app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
 app.set('port', process.env.PORT || 3000);
 
 
+/*中间件*/
 //使用域（更好的）错误处理
 app.use(function(req, res, next){
 	var domain = require('domain').create();// 为这个请求创建一个域
@@ -78,6 +81,8 @@ app.use(require('body-parser')());
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')());
 app.use(express.static(__dirname+'/public'));//static中间件,express.static指定静态文件目录
+app.use(cartValidation.checkWaivers);
+app.use(cartValidation.checkGuestCounts);
 app.use(function(req, res, next){//简单中间件例子
 	console.log('处理请求 "' + req.url + '"....');
 	next();
@@ -122,6 +127,7 @@ app.use(function(req, res, next){
 	res.locals.partials.fancy = getFancy();
 	next();
 });
+
 
 //路由
 app.get('/', function(req, res) {
