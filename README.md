@@ -325,4 +325,17 @@
 		`app.use(cartValidation.checkWaivers);`
 		`app.use(cartValidation.checkGuestCounts);`
 
++ ## 发送邮件Nodemailer
+
+	* 安装： `$ npm install --save nodemailer;`
+	* 引入并创建一个Nodemailer示例，[lib/email.js](lib/email.js)
+	* 设置credentials模块
+
+		```javascript
+			gmail: {
+				user: '你的谷歌账户用户名',
+				password: '你的谷歌账户密码'
+			},
+		```
+
 + ##
