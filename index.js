@@ -38,7 +38,7 @@ var handlebars = require('express3-handlebars')
 						}
 					});
 app.engine('handlebars', handlebars.engine);//设置模板引擎，处理指定的后缀名文件
-app.set('view engine', 'handlebars');//指定渲染模板文件的后缀名
+app.set('view engine', 'handlebars');//注册模板引擎
 app.set('port', process.env.PORT || 3000);
 
 
