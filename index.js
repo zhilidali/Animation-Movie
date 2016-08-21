@@ -1,14 +1,10 @@
 //主程序入口文件
 var http = require('http');
-var fs = require('fs');
 var express = require('express');
-var mymodule = require('./lib/mymodule');
 var credentials = require('./lib/credentials.js');
 var cartValidation = require('./lib/cartValidation.js');
 var emailService = require('./lib/email.js')(credentials);
-var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
-var Movie = require('./models/movie.js');
 var mongoose = require('mongoose');
 var vhost = require('vhost');
 
@@ -159,185 +155,21 @@ admin.get('users', function(req, res){
 });
 
 //路由
-/*app.get('/fail', function(req, res) {
-	throw new Error('Node!');//未捕获异常
-});*/
-app.get('/', function(req, res) {
-	res.render('home');
-});
-app.get('/about', function(req, res) {
-	res.render('about', {
-		MovieName: mymodule.getMovieName(),
-		pageTestScript: '/qa/tests-about.js'
-	});
-});
-app.get('/jquerytest', function(req, res) {//测试段落section
-	res.render('jquerytest');
-});
-app.get('/client-template', function(req, res) {//客户端模板
-	res.render('client-template');
-});
-app.get('/data/client-template', function(req, res) {//客户端模板
-	res.json({
-		animal: 'squirrel',
-		bodyPart: 'tail',
-		adjective: 'bushy',
-		noun: 'heck',
-	});
-});
-app.get('/newsletter', function(req, res) {//表单处理
-	res.render('newsletter', {csrf: "这里是CSRF令牌"});
-});
-/*
-function NewsletterSignup(){
-}
-NewsletterSignup.prototype.save = function(cb){
-	cb();
-};
-var VALID_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-app.post('/newsletter', function(req, res){
-	var name = req.body.name || '', email = req.body.email || '';
-	// input validation
-	if(!email.match(VALID_EMAIL_REGEX)) {
-		if(req.xhr) return res.json({ error: 'Invalid name email address.' });
-		req.session.flash = {
-			type: 'danger',
-			intro: 'Validation error!',
-			message: 'The email address you entered was  not valid.',
-		};
-		return res.redirect(303, '/newsletter/archive');
+require('./routes.js')(app);
+
+//自动化渲染视图
+var autoViews = {};
+app.use(function(req,res,next){
+	var path = req.path.toLowerCase();
+	//检查缓存，存在，则渲染这个视图
+	if(autoViews[path]) return res.render(autoViews[path]);
+	// 如果他不在缓存里，那就看看有没有.handlebars文件能匹配
+	if(fs.existsSync(__dirname + '/views' + path + '.handlebars')){
+		autoViews[path] = path.replace(/^\//, '');
+		return res.render(autoViews[path]);
 	}
-	new NewsletterSignup({ name: name, email: email }).save(function(err){
-		if(err) {
-			if(req.xhr) return res.json({ error: 'Database error.' });
-			req.session.flash = {
-				type: 'danger',
-				intro: 'Database error!',
-				message: 'There was a database error; please try again later.',
-			};
-			return res.redirect(303, '/newsletter/archive');
-		}
-		if(req.xhr) return res.json({ success: true });
-		req.session.flash = {
-			type: 'success',
-			intro: 'Thank you!',
-			message: 'You have now been signed up for the newsletter.',
-		};
-		return res.redirect(303, '/newsletter/archive');
-	});
-});
-app.get('/newsletter/archive', function(req, res){
-	res.render('newsletter/archive');
-});
-*/
-app.post('/process', function(req, res) {//表单处理
-	if (req.xhr || req.accepts('json, html')==='json') {
-		res.send({success: true});
-	} else {
-		res.redirect(303, '/thank-you');
-	}
-});
-
-//跨页测试
-app.get('/workroom', function(req, res) {
-	res.render('workroom/workroom');
-});
-app.get('/workroom/dreamworks', function(req, res) {
-	res.render('workroom/dreamworks');
-});
-
-app.get('/headers', function(req, res) {//示例：查看浏览器发送信息
-	res.set('Content-Type', 'text/plain');
-	var s = '';
-	for (var name in req.headers) s += name+":"+req.headers[name]+'\n';
-	res.send(s);
-});
-app.get('/upload-cover',function(req,res){//文件上传示例
-	var now = new Date();
-	res.render('upload-cover',{
-		year: now.getFullYear(),
-		month: now.getMonth()
-	});
-});
-
-//文件系统化
-var dataDir = __dirname + '/data';// 确保存在目录data
-var vacationPhotoDir = dataDir + '/vacation-photo';
-if(!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-if(!fs.existsSync(vacationPhotoDir)) fs.mkdirSync(vacationPhotoDir);
-function saveContestEntry(contestName, email, year, month, photoPath){
-	// TODO...这个稍后再做
-}
-app.post('/upload-cover/:year/:month', function(req, res){//文件上传示例
-	var form = new formidable.IncomingForm();
-	form.parse(req, function(err, fields, files){
-		if(err) return res.redirect(303, '/error');
-		if(err) {
-			res.session.flash = {
-				type: 'danger',
-				intro: 'Oops!',
-				message: '你的提交有一个错误处理。' +
-				'请重试.',
-			};
-			return res.redirect(303, '/upload-cover');
-		}
-		var photo = files.photo;
-		var dir = vacationPhotoDir + '/' + Date.now();
-		var path = dir + '/' + photo.name;
-		fs.mkdirSync(dir);
-		fs.renameSync(photo.path, dir + '/' + photo.name);
-		saveContestEntry('upload-cover', fields.email,
-			req.params.year, req.params.month, path);
-		req.session.flash = {
-			type: 'success',
-			intro: 'Good luck!',
-			message: '你已经参加了比赛。',
-		};
-		res.redirect(303, '/thank-you');
-	});
-});
-//持久化
-Movie.find(function(err, movies){
-	if(movies.length) return;
-
-	new Movie({
-		name: '宠物大机密',
-		description: '2016年卖萌动画电影',
-		workroom: '娱乐照明',
-		notes: 100,
-		tags: ['CG', '宠物的秘密生活', '娱乐照明'],
-		city: ['美国'],
-		sku: '0c39',
-		date: '2016-08-03',
-		available: true
-	}).save();
-
-	new Movie({
-		name: '疯狂动物城',
-		description: '迪士尼继超能陆战队又一最新力作',
-		notes: 99,
-		tags: ['动物乌托邦', 'CG', '迪士尼'],
-		city: ['美国'],
-		sku: 'HR1999',
-		date: '2016-03',
-		available: true
-	}).save();
-});
-app.get('/movies', function(req, res) {
-	Movie.find({ available: true }, function(err, movies){
-		var context = {
-			movies: movies.map(function(movie){
-				movie.notes = movie.getNotes();
-				return movie;
-			})
-		};
-		res.render('movies', context);
-	});
-});
-//路由参数
-app.get('/user/:name', function(req, res){
-	var username = req.params.name;
-	res.render('user', username);
+	//没有发现视图，转到404
+	next();
 });
 
 //404页面

@@ -527,3 +527,43 @@
 				res.render('user', username);
 			});
 		```
+
+	+ ### 组织路由
+
+		* 模块中声明路由
+			创建`routes.js`
+
+			```javascript
+				module.export = function(app) {
+					app.get('/', function(req, res){
+						app.render(home);
+					});
+				};
+				//...
+			```
+
+			主程序中`require('./routes.js')(app);`
+		* 按逻辑对路由分组
+
+			具体看routes.js和handlers目录
+
+		* 自动化渲染视图
+
+			```javascript
+				//自动化渲染视图
+				var autoViews = {};
+				app.use(function(req,res,next){
+					var path = req.path.toLowerCase();
+					//检查缓存，存在，则渲染这个视图
+					if(autoViews[path]) return res.render(autoViews[path]);
+					// 如果他不在缓存里，那就看看有没有.handlebars文件能匹配
+					if(fs.existsSync(__dirname + '/views' + path + '.handlebars')){
+						autoViews[path] = path.replace(/^\//, '');
+						return res.render(autoViews[path]);
+					}
+					//没有发现视图，转到404
+					next();
+				});
+			```
+
++ ##
