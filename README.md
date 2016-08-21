@@ -24,6 +24,9 @@
 	5. lib 保存模块的目录
 	6. 跨页测试
 	7. Gruntfile.json
+	8. models 存放模型
+	9. viewModels 视图模型
+	10. controllers 控制器
 
 + ## 质量保证
 
@@ -398,4 +401,77 @@
 		* `$ npm install --save loadtest;`
 		* [tests-stress.js](qa/tests-stress.js)
 
-+ ##
++ ## 持久化
+
+	+ ### 文件系统持久化
+
+	+ ### 数据库持久化
+
+		* `npm install --save mongoose;`
+		* 添加数据凭证[credentials.js](lib/credengtial.js)
+
+			```javascript
+				mongo: {
+					development: {
+						connectionString: "你的开发数据库连接"
+					},
+					production: {
+						connectionString: "你的生产数据库连接"
+					}
+				}
+			```
+
+		* 创建数据库连接 `$ npm install --save mongoose;`
+
+			```javascript
+				var mongoose = require('mongoose');
+				var opts = {
+					server: {
+						socketOptions: {keepAlive: 1}
+					}
+				};
+				switch(app.get('env')){
+					case 'development':
+						mongoose.connect(creadentials.mongo.development.connectionString, opts);
+						break;
+					case 'production':
+						mongoose.connect(creadentials.mongo.prodection.connectionString, opts);
+						break;
+					default:
+						throw new Error('Unknow execution enviroment: ' + app.get('env'));
+				}
+			```
+
+		* 创建模式和模型
+			* 创建电影包数据库[movie.js](models/movies.js)
+		* 添加初始化数据
+
+			```javascript
+				Movie.find(function(err, movies){
+					if(movies.length) return;
+
+					new Movie({
+						name: '宠物大机密',
+						descript: '2016年卖萌动画电影',
+						workroom: '娱乐照明',
+						notes: 100,
+						tags: ['CG', '宠物的秘密生活', '娱乐照明'],
+						city: ['美国'],
+						sku: '0c39',
+						date: '2016-08-03'
+					}).save();
+
+					new Movie({
+						name: '疯狂动物城',
+						descript: '迪士尼继超能陆战队又一最新力作',
+						notes: 99,
+						tags: ['动物乌托邦', 'CG', '迪士尼'],
+						city: ['美国'],
+						sku: 'HR1999',
+						date: '2016-03'
+					}).save();
+				});
+			```
+
+		* 获取数据[movies.handlebars](views/movies.handlebars)
+		* 添加路由
