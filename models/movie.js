@@ -1,14 +1,15 @@
 var mongoose = require('mongoose');
-
+//创建模式
 var movieSchema = mongoose.Schema({
 	name: String,
-	descript: String,
+	description: String,
 	notes: Number,
 	workroom: String,
 	tags: [String],
 	city: String,
 	sku: String,
-	date: String
+	date: String,
+	available: Boolean
 });
 movieSchema.methods.getNotes = function() {
 	return this.notes;

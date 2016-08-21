@@ -10,6 +10,7 @@ var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
 var Movie = require('./models/movie.js');
 var mongoose = require('mongoose');
+var vhost = require('vhost');
 
 var app = express();
 var opts = {
@@ -27,30 +28,6 @@ switch(app.get('env')){
 	default:
 		throw new Error('Unknow execution enviroment: ' + app.get('env'));
 }
-Movie.find(function(err, movies){
-	if(movies.length) return;
-
-	new Movie({
-		name: '宠物大机密',
-		descript: '2016年卖萌动画电影',
-		workroom: '娱乐照明',
-		notes: 100,
-		tags: ['CG', '宠物的秘密生活', '娱乐照明'],
-		city: ['美国'],
-		sku: '0c39',
-		date: '2016-08-03'
-	}).save();
-
-	new Movie({
-		name: '疯狂动物城',
-		descript: '迪士尼继超能陆战队又一最新力作',
-		notes: 99,
-		tags: ['动物乌托邦', 'CG', '迪士尼'],
-		city: ['美国'],
-		sku: 'HR1999',
-		date: '2016-03'
-	}).save();
-});
 
 var handlebars = require('express3-handlebars')
 					.create({
@@ -169,6 +146,17 @@ app.use(function(req, res, next){
 	next();
 });
 
+//创建子域名`admin`,应出现在所有其他路由之前
+var admin = express.Router();
+app.use(vhost('admin.*', admin));
+
+//创建admin的路由，可在任何地方定义
+admin.get('/', function(req, res){
+	res.render('admin/home');
+});
+admin.get('users', function(req, res){
+	res.render('admin/users');
+});
 
 //路由
 /*app.get('/fail', function(req, res) {
@@ -181,19 +169,6 @@ app.get('/about', function(req, res) {
 	res.render('about', {
 		MovieName: mymodule.getMovieName(),
 		pageTestScript: '/qa/tests-about.js'
-	});
-});
-app.get('/movies', function(req, res) {
-	Movie.find({ available: true }, function(err, movies){
-		var context = {
-			movies: movies.map(function(movie){
-				return {
-					name: movie.name,
-					description: movie.description,
-				};
-			})
-		};
-		res.render('movies', context);
 	});
 });
 app.get('/jquerytest', function(req, res) {//测试段落section
@@ -320,6 +295,49 @@ app.post('/upload-cover/:year/:month', function(req, res){//文件上传示例
 		};
 		res.redirect(303, '/thank-you');
 	});
+});
+//持久化
+Movie.find(function(err, movies){
+	if(movies.length) return;
+
+	new Movie({
+		name: '宠物大机密',
+		description: '2016年卖萌动画电影',
+		workroom: '娱乐照明',
+		notes: 100,
+		tags: ['CG', '宠物的秘密生活', '娱乐照明'],
+		city: ['美国'],
+		sku: '0c39',
+		date: '2016-08-03',
+		available: true
+	}).save();
+
+	new Movie({
+		name: '疯狂动物城',
+		description: '迪士尼继超能陆战队又一最新力作',
+		notes: 99,
+		tags: ['动物乌托邦', 'CG', '迪士尼'],
+		city: ['美国'],
+		sku: 'HR1999',
+		date: '2016-03',
+		available: true
+	}).save();
+});
+app.get('/movies', function(req, res) {
+	Movie.find({ available: true }, function(err, movies){
+		var context = {
+			movies: movies.map(function(movie){
+				movie.notes = movie.getNotes();
+				return movie;
+			})
+		};
+		res.render('movies', context);
+	});
+});
+//路由参数
+app.get('/user/:name', function(req, res){
+	var username = req.params.name;
+	res.render('user', username);
 });
 
 //404页面

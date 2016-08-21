@@ -444,7 +444,7 @@
 
 		* 创建模式和模型
 			* 创建电影包数据库[movie.js](models/movies.js)
-		* 添加初始化数据
+		* 添加初始数据
 
 			```javascript
 				Movie.find(function(err, movies){
@@ -475,3 +475,55 @@
 
 		* 获取数据[movies.handlebars](views/movies.handlebars)
 		* 添加路由
+
+			```javascript
+				app.get('/movies', function(req, res) {
+					Movie.find({ available: true }, function(err, movies){
+						var context = {
+							movies: movies.map(function(movie){
+								movie.notes = movie.getNotes();
+								return movie;
+							})
+						};
+						res.render('movies', context);
+					});
+				});
+			```
+
++ ## 路由
+
+	+ ### `IA`信息架构
+
+		* 不暴露细节
+		* 避免无意义信息
+		* 避免无谓的URL
+		* 单词分隔符一致
+		* 勿用空格或不可录入的字符
+		* 用小写字母
+
+	+ ### 子域名
+
+		* `$ npm install ---save vhost;`
+
+		```javascript
+			//创建子域名`admin`,应出现在所有其他路由之前
+			var admin = express.Router();
+			app.use(vhost('admin.*', admin));
+
+			//创建admin的路由，可在任何地方定义
+			admin.get('/', function(req, res){
+				res.render('admin/home');
+			});
+			admin.get('users', function(req, res){
+				res.render('admin/users');
+			});
+		```
+
+	+ ### 路由参数
+
+		```
+			app.get('/user/:name', function(req, res){
+				var username = req.params.name;
+				res.render('user', username);
+			});
+		```
