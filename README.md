@@ -35,39 +35,33 @@
 		- 目标：
 			* 访问`http://localhost:3000`加载首页
 			* 访问`http://localhost:3000?test=1`加载包含测试的首页
-
 		a. 测试模块
-
-			```
-				$ npm install --save--dev mocha;
-				$ npm install --save-dev chai;
-				$ cp node_modules/mocha/mocha.js public/vendor
-				$ cp node_modules/mocha/mocha.css public/vendor
-				$ cp node_modules/chai/chai.js public/vendor
-			```
-
+			`$ npm install --save--dev mocha;`
+			`$ npm install --save-dev chai;`
+			`$ cp node_modules/mocha/mocha.js public/vendor`
+			`$ cp node_modules/mocha/mocha.css public/vendor`
+			`$ cp node_modules/chai/chai.js public/vendor`
 		b. 中间件检测查询字符串`test=1`,在路由之前添加
 
-			```
+			```javascript
 				app.use(function(req, res){
 					res.locals.showTest = app.get('env') !== 'public' && req.query.test === '1';
 				});
 			```
 
 		c. 有条件的引入测试,`views/layouts/main.handlebars`
+			* <head>部分
 
-			<head>部分
-
-				```
+				```javascript
 				{{!-- 跨页测试 --}}
 					{{#if showTests}}
 						<link rel="stylesheet" href="/vendor/mocha.css">
 					{{/if}}
 				```
 
-			</body>之前
+			* </body>之前
 
-				```
+				```html
 					{{#if showTests}}{{!-- 跨页测试 --}}
 					<div id="mocha"></div>
 					<script src="/vendor/mocha.js"></script>
@@ -88,7 +82,7 @@
 
 		d. 全局测试`public/qa/tasts-global.js`
 
-			```
+			```javascript
 				suite('全局页面测试', function(){
 					test('页面有一个有效的标题', function(){
 						assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
@@ -99,7 +93,7 @@
 			访问http://localhost:3000?test=1
 		e.页面测试`public/qa/tests-about.js`;
 
-			```
+			```javascript
 			suite('全局页面测试', function(){
 				test('页面有一个有效的标题', function(){
 					assert(document.title && document.title.match(/\S/) && document.title.toUpperCase() !== 'TODO');
@@ -124,7 +118,7 @@
 				});
 			```
 		b. 测试的方法
-			* `$ npm install --save-dev zombie;
+			* `$ npm install --save-dev zombie;`
 			* [qa/tests-crosspage.js](qa/tests-crosspage.js)
 		c. 启动服务， `$ mocha -u tdd -R spec qa/tests-crossage.js 2>/dev/null`
 
@@ -142,7 +136,8 @@
 		[LinkChecker](http://wummel.github.io/linkchecker/)
 		* `$ linkchecker http://localhost:3000;`
 
-	+ ### 用Grunt实现自动化
+	+ ### Grunt实现自动化
+
 		a. 安装Grunt命令行及Grunt本身
 			* `$ install -g grunt-cli;`
 			* `$ npm install --save-dev grunt;`
@@ -192,13 +187,14 @@
 
 	+ ### `section`段落
 
-		* 视图本身添加到布局的不同部分时
+		视图本身添加到布局的不同部分时
 		a. 实例化Handlebars对象时，添加一个叫做section的方法
 		b. 创建[jquerytest](views/jquerytest.handlebars)
 		c. 布局文件里，放置段落
 
-	+ ### 客户端Handlebars: 显示动态内容
+	+ ### 客户端Handlebars
 
+		显示动态内容
 		a. 创建[client-template](views/client-template.handlebars)
 		b. 添加针对client-template页面的路由和AJAX调用的路由
 
@@ -320,8 +316,9 @@
 				});
 			```
 
-+ ## 中间件： 封装在程序中处理HTTP请求的功能(函数)
++ ## 中间件
 
+	封装在程序中处理HTTP请求的功能(函数)
 	* [cartValidation](lib/cartValidation.js)
 	* `var cartValidation = require('./lib/cartValidation.js');`
 	*
@@ -366,10 +363,13 @@
 			}
 		```
 
-	+ ### 扩展：向上扩展、向外扩展
+	+ ### 扩展：
 
-		- ##### 应用集群扩展：可为系统上每个CPU内核创建一个独立的服务器
+		向上扩展、向外扩展
 
+		- ##### 应用集群扩展
+
+			可为系统上每个CPU内核创建一个独立的服务器
 			a. 对主程序作调整
 
 				```javascript
@@ -565,5 +565,3 @@
 					next();
 				});
 			```
-
-+ ##
