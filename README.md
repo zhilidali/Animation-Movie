@@ -1,38 +1,40 @@
 + ## 运行
-	a. 在终端输入'npm install'，安装模依赖;
-	b. 执行程序文件index.js，在终端输入`node index`
+
+	a. 在终端输入`$ npm install`，安装模依赖;
+	b. 执行程序文件`index.js`，在终端输入`$ node index`
 
 + ## Use说明
-	1. 开发框架:Express
-	2. 视图引擎:Handlebars
+	1. 开发框架:`Express`
+	2. 视图引擎:`Handlebars`
 	3. 测试:
-		*assert函数: Chai断言库
-		*页面测试：Mocha
-		*跨页测试: Zombies.js
+		* assert函数: `Chai`断言库
+		* 页面测试：`Mocha`
+		* 跨页测试: `Zombies`
 	4. ...
 
 + ## 目录
-	1. package.json 存放项目元数据描述项目和列出依赖项
-	2. index.js 主程序文件
-	3. views 视图文件夹
-		* /layouts 放置布局/母版页的文件夹
-		* /partials 局部文件
-	4. public 放置静态资源
-		* /img
-		* /vendor 第三方库
-		* /qa 页面测试
-	5. lib 保存模块的目录
-	6. 跨页测试
-	7. Gruntfile.json
-	8. models 存放模型
-	9. viewModels 视图模型
-	10. controllers 控制器
+
+	1. `package.json` 存放项目元数据描述项目和列出依赖项
+	2. `index.js` 主程序文件
+	3. `views` 视图文件夹
+		* `layouts` 放置布局/母版页的文件夹
+		* `partials` 局部文件
+	4. `public` 放置静态资源
+		* `img`
+		* `vendor` 第三方库
+		* `qa` 页面测试
+	5. `lib` 保存模块的目录
+	6. `qa` 测试
+	7. `Gruntfile.json`
+	8. `models` 存放模型
+	9. `viewModels` 视图模型
+	10. `controllers` 控制器
 
 + ## 质量保证
 
 	+ ### 页面测试
 
-		- 目标：
+		* 目标：
 			* 访问`http://localhost:3000`加载首页
 			* 访问`http://localhost:3000?test=1`加载包含测试的首页
 		a. 测试模块
